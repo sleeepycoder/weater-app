@@ -1,42 +1,28 @@
-import React, { useState, useEffect } from 'react';
+
+
+import React, { useState } from 'react';
 import SearchBar from './components/SearchBar';
 import WeatherCard from './components/WeatherCard';
+import useApi from './hooks/useApi';
 
 const App = () => {
   const [city, setCity] = useState('');
-  const [weather, setWeather] = useState(null);
-
-  useEffect(() => {
-    const fetchWeatherData = async () => {
-      if (city.trim()) {
-        const apiKey = 'b878f11ab67017090468e6e381857ccb'; // Obtain API key from OpenWeatherMap
-        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
-
-        try {
-          const response = await fetch(apiUrl);
-          const data = await response.json();
-          setWeather(data);
-        } catch (error) {
-          console.error('Error fetching weather data:', error);
-        }
-      }
-    };
-
-    fetchWeatherData();
-  }, [city]); // Trigger effect when 'city' state changes
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=2d9c58f0e233ce0015ecfacb6cc0765c`;
+  const { data, loading, error } = useApi(apiUrl);
 
   const handleSearch = (searchCity) => {
     setCity(searchCity);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="container mx-auto p-4 flex flex-col items-center justify-center my-44">
       <h1 className="text-3xl font-bold mb-4">Weather Dashboard</h1>
       <SearchBar onSearch={handleSearch} />
-      {weather && <WeatherCard weather={weather} />}
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      {data && <WeatherCard weather={data} />}
     </div>
   );
 };
 
 export default App;
-
